@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>carousel</title>
+</head>
+<meta charset="utf-8">
+<style type="text/css">
+	*{
+		margin: 0;
+		padding: 0;
+	}
+	.container{
+		width: 800px;
+		height: 600px;
+		position: relative;
+		margin: 0 auto;
+		overflow: hidden;
+	}
+	.showimg{
+		position: absolute;
+		width: 5600px;
+		height: 600px;
+		z-index: 1;
+	}
+	.showimg img{
+		width: 800px;
+		height: 600px;
+		margin: 0;
+		padding: 0;
+		float: left;
+	}
+	.container:hover a{
+		display: block;
+	}
+	.arro{
+		cursor: pointer;
+		display: none;
+		position: absolute;
+		z-index: 2;
+		width: 50px;
+		height: 50px;
+		line-height: 42px;
+		text-align: center;
+		top: 250px;
+		text-decoration: none;
+		color: black;
+		font-size: 50px;
+		background-color: white;
+		opacity: .3;
+		user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+	}
+	.arro:hover {
+		opacity: .8;
+	}
+	#left{
+		left: 20px;
+	}
+	#right{
+		right: 20px;
+	}
+	.button{
+	    z-index: 2;
+	    position: absolute;
+	    left: 370px;
+	    bottom: 8px;
+	    background-color: #fff;
+	    opacity: .7;
+	    width: 83px;
+	    height: 14px;
+	    border-radius: 10px;
+	    padding: 2px 0px 0px 5px
+	}
+	.button span{
+		cursor: pointer;
+		display: block;
+		z-index: 2;
+		border:1px solid #000;
+		float: left;
+		display: block;
+		width: 10px;
+		height: 10px;
+		border-radius: 10px;
+		margin-right: 5px;
+	}
+	.on{
+		background-color: #ff944d;
+	}
+</style>
+<script type="text/javascript">
+	window.onload = function() {
+		var con = document.getElementsByClassName('container')[0];
+		var next = document.getElementById('right');
+		var prev = document.getElementById('left');
+		var list = document.getElementsByClassName('showimg')[0];
+		var buttons = document.getElementsByClassName('button')[0].getElementsByTagName('span');
+		var index = 1;
+		var isMove = false;
+		var autoMove;
+		function animate(distance) { //图片移动函数
+			
+			var newDistance = parseInt(list.style.left) + distance;
+			var time = 400; //每次位移所需要的时间
+			var interval = 10;  //每次位移中的位移间隔时间
+			var speed = distance/(time/interval);
+
+			function move() { //图片动画效果
+				if( (speed < 0 && parseInt(list.style.left) > newDistance) || (speed > 0 && parseInt(list.style.left) < newDistance)) {
+					isMove = true;
+					list.style.left = parseInt(list.style.left) + speed + "px";
+					setTimeout(move, interval);					
+				}else{
+					isMove = false;
+					list.style.left = newDistance + "px";
+					if(newDistance < -4000){
+						list.style.left = -800 + "px";
+					}
+					if(newDistance > 800){
+						list.style.left = -4000 + "px";
+					}					
+				}
+			}
+			move();
+		}
+
+		for(var i = 0;i <buttons.length; i++){	//按钮点击图片跳转效果
+			buttons[i].onclick = function() {
+				var checkIndex = parseInt(this.getAttribute('index'), 10);
+				if(checkIndex == index){
+					return;
+				}else{
+					var distance = (checkIndex - index) * -800;
+					animate(distance);
+					index = checkIndex;
+					buttonOn();				
+				}
+			}
+		}
+		function buttonOn() { //图片对应按钮高亮动画效果
+			for(var i = 0; i < buttons.length; i++){
+				if(buttons[i].className == 'on') buttons[i].className = '';
+				buttons[index-1].className = 'on';
+			}
+		}
+
+		function play() {	//自动播放定时器
+			autoMove = setInterval(next.onclick, 3000);
+		}
+
+		function stop() {	//定时器清除
+			clearInterval(autoMove);
+		}
+
+		next.onclick = function() {  //右箭头点击效果
+			if(!isMove){
+				if(index == 5){
+					index = 1;
+				}else{
+					index += 1;
+				}
+				buttonOn();
+				animate(-800);					
+			}
+		}
+
+		prev.onclick = function() {	//左箭头点击效果
+			if(!isMove){
+				if(index == 1){
+					index = 5;
+				}else{
+					index -= 1;
+				}
+				buttonOn();
+				animate(800);								
+			}
+
+		}
+
+		con.onmouseover = stop;	//鼠标悬浮在图片便中止图片自动播放
+		con.onmouseout = play;	//鼠标移开后恢复
+		play();
+	}
+</script>
+<body>
+<div class="container">
+	<div class="showimg" style="left:0px;">
+		<img src="img/5.jpg">
+		<img src="img/1.png">
+		<img src="img/2.jpg">
+		<img src="img/3.jpg">
+		<img src="img/4.jpg">
+		<img src="img/5.jpg">
+		<img src="img/1.png">
+	</div>
+	<a class="arro" id='left'>&lt</a>
+	<a class="arro" id='right'>&gt</a>
+	<div class="button">
+		<span index="1" class='on'></span>
+		<span index="2"></span>
+		<span index="3"></span>
+		<span index="4"></span>
+		<span index="5"></span>
+	</div>
+</div>
+</body>
+</html>
